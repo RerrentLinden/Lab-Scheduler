@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>设备台账 · Lab Scheduler</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body class="page page--instruments">
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="top-nav" role="banner">
+      <div class="brand">Lab Scheduler</div>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="index.html">仪器概览</a></li>
+          <li><a href="bookings.html">预约日历</a></li>
+          <li><a class="is-active" href="instruments.html">设备台账</a></li>
+          <li><a href="analytics.html">统计报表</a></li>
+        </ul>
+      </nav>
+      <div class="user-pill" aria-label="当前用户">
+        <span class="user-name">李实验</span>
+        <span class="user-role">超级管理员</span>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <header class="page-header">
+        <div>
+          <h1>设备台账</h1>
+          <p>集中管理仪器信息、状态和维护记录。</p>
+        </div>
+        <div class="page-header__actions">
+          <a class="button" href="#new-instrument">新增仪器</a>
+          <button class="button button--secondary" type="button" data-export-instruments>
+            导出设备清单
+          </button>
+        </div>
+      </header>
+
+      <section class="metrics-grid metrics-grid--compact" aria-label="仪器统计">
+        <article class="card metric" data-metric-card="total-instruments">
+          <h2>设备总数</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>含已维护</p>
+        </article>
+        <article class="card metric" data-metric-card="available-instruments">
+          <h2>可用中</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>状态正常</p>
+        </article>
+        <article class="card metric" data-metric-card="maintenance-instruments">
+          <h2>维护中</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>含停机提醒</p>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="instrumentFilterHeading">
+        <div class="panel__header">
+          <h2 id="instrumentFilterHeading">筛选器</h2>
+          <input class="input-search" type="search" id="instrumentSearch" placeholder="按名称或编号搜索" data-search-instrument />
+        </div>
+        <form class="filter-bar" data-instrument-filter>
+          <div class="form__row">
+            <label class="visually-hidden" for="instrumentCategory">分类</label>
+            <select id="instrumentCategory" name="category">
+              <option value="all">全部分类</option>
+              <option value="chemistry">化学分析</option>
+              <option value="biology">生物检测</option>
+              <option value="imaging">成像/显微</option>
+            </select>
+          </div>
+          <div class="form__row">
+            <label class="visually-hidden" for="instrumentStatus">状态</label>
+            <select id="instrumentStatus" name="status">
+              <option value="all">所有状态</option>
+              <option value="available">可预约</option>
+              <option value="maintenance">维护中</option>
+              <option value="retired">已退役</option>
+            </select>
+          </div>
+          <div class="form__row">
+            <label class="visually-hidden" for="instrumentManager">责任人</label>
+            <select id="instrumentManager" name="manager">
+              <option value="all">所有负责人</option>
+            </select>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="instrumentTableHeading">
+        <div class="panel__header">
+          <h2 id="instrumentTableHeading">仪器列表</h2>
+          <span class="panel__meta" data-instrument-count>共 0 台</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">仪器</th>
+                <th scope="col">编号</th>
+                <th scope="col">所在房间</th>
+                <th scope="col">状态</th>
+                <th scope="col">负责人</th>
+                <th scope="col">操作</th>
+              </tr>
+            </thead>
+            <tbody data-instrument-table>
+              <tr>
+                <td colspan="6">暂无仪器数据</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="panel panel--secondary" aria-labelledby="instrumentDetailHeading">
+        <h2 id="instrumentDetailHeading">仪器详情</h2>
+        <div class="instrument-detail" data-instrument-detail>
+          <p class="placeholder">点击列表中的仪器查看档案、维护和预约情况。</p>
+        </div>
+      </aside>
+
+      <section class="panel" id="new-instrument" aria-labelledby="newInstrumentHeading">
+        <h2 id="newInstrumentHeading">新增仪器</h2>
+        <form class="form" data-new-instrument>
+          <div class="form__row">
+            <label for="newInstrumentName">仪器名称</label>
+            <input id="newInstrumentName" name="name" type="text" required />
+          </div>
+          <div class="form__row form__row--inline">
+            <div>
+              <label for="newInstrumentId">仪器编号</label>
+              <input id="newInstrumentId" name="code" type="text" required />
+            </div>
+            <div>
+              <label for="newInstrumentCategory">分类</label>
+              <select id="newInstrumentCategory" name="category" required>
+                <option value="chemistry">化学分析</option>
+                <option value="biology">生物检测</option>
+                <option value="imaging">成像/显微</option>
+                <option value="general">通用设备</option>
+              </select>
+            </div>
+          </div>
+          <div class="form__row form__row--inline">
+            <div>
+              <label for="newInstrumentRoom">房间</label>
+              <input id="newInstrumentRoom" name="room" type="text" placeholder="例如：B2-305" />
+            </div>
+            <div>
+              <label for="newInstrumentManager">负责人</label>
+              <input id="newInstrumentManager" name="manager" type="text" placeholder="负责人姓名" />
+            </div>
+          </div>
+          <div class="form__row">
+            <label for="newInstrumentDesc">仪器简介</label>
+            <textarea id="newInstrumentDesc" name="description" rows="3" placeholder="填写仪器功能、适用实验等信息"></textarea>
+          </div>
+          <button class="button" type="submit">保存仪器</button>
+          <p class="form__feedback" data-new-instrument-feedback hidden></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2024 Lab Scheduler</p>
+      <p>
+        <a href="index.html">返回仪器概览</a>
+        <span aria-hidden="true">·</span>
+        <a href="README.zh.md">文档</a>
+      </p>
+    </footer>
+  </body>
+</html>
