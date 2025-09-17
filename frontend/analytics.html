@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>统计报表 · Lab Scheduler</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body class="page page--analytics">
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="top-nav" role="banner">
+      <div class="brand">Lab Scheduler</div>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="index.html">仪器概览</a></li>
+          <li><a href="bookings.html">预约日历</a></li>
+          <li><a href="instruments.html">设备台账</a></li>
+          <li><a class="is-active" href="analytics.html">统计报表</a></li>
+        </ul>
+      </nav>
+      <div class="user-pill" aria-label="当前用户">
+        <span class="user-name">李实验</span>
+        <span class="user-role">超级管理员</span>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <header class="page-header">
+        <div>
+          <h1>统计报表</h1>
+          <p>分析预约数据，掌握仪器利用率与人员行为趋势。</p>
+        </div>
+        <div class="page-header__actions">
+          <button class="button button--secondary" type="button" data-export-analytics>
+            导出报表
+          </button>
+          <button class="button button--ghost" type="button" data-schedule-review>
+            订阅周报
+          </button>
+        </div>
+      </header>
+
+      <section class="metrics-grid" aria-label="关键指标">
+        <article class="card metric" data-metric-card="monthly-slots">
+          <h2>月度预约时段</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>较上月 0%</p>
+        </article>
+        <article class="card metric" data-metric-card="peak-days">
+          <h2>高峰日</h2>
+          <p class="metric__value">-</p>
+          <p class="metric__delta" data-delta>预计实验室最忙日期</p>
+        </article>
+        <article class="card metric" data-metric-card="avg-duration">
+          <h2>平均预约时长</h2>
+          <p class="metric__value">0 小时</p>
+          <p class="metric__delta" data-delta>规则上限 4 小时</p>
+        </article>
+        <article class="card metric" data-metric-card="violation-rate">
+          <h2>违约率</h2>
+          <p class="metric__value">0%</p>
+          <p class="metric__delta" data-delta>含爽约与超时</p>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="utilizationHeading">
+        <div class="panel__header">
+          <h2 id="utilizationHeading">仪器利用率趋势</h2>
+          <p class="panel__meta">按分类查看最近 8 周的利用率</p>
+        </div>
+        <div class="chart-grid" data-utilization-chart>
+          <div class="chart" data-chart="chemistry">
+            <h3>化学分析</h3>
+            <div class="chart__bars"></div>
+          </div>
+          <div class="chart" data-chart="biology">
+            <h3>生物检测</h3>
+            <div class="chart__bars"></div>
+          </div>
+          <div class="chart" data-chart="imaging">
+            <h3>成像/显微</h3>
+            <div class="chart__bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="topUsageHeading">
+        <div class="panel__header">
+          <h2 id="topUsageHeading">热门仪器排行</h2>
+          <span class="panel__meta" data-top-usage-period>统计周期：-</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">排名</th>
+                <th scope="col">仪器</th>
+                <th scope="col">预约时长</th>
+                <th scope="col">预约次数</th>
+                <th scope="col">利用率</th>
+              </tr>
+            </thead>
+            <tbody data-top-usage>
+              <tr>
+                <td colspan="5">暂无数据</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel panel--secondary" aria-labelledby="violationHeading">
+        <h2 id="violationHeading">违规事件</h2>
+        <ul class="timeline" data-violation-list>
+          <li class="placeholder">本月暂无违规事件。</li>
+        </ul>
+      </section>
+
+      <section class="panel panel--secondary" aria-labelledby="backupHeading">
+        <h2 id="backupHeading">数据与备份</h2>
+        <div class="data-health" data-data-health>
+          <p class="placeholder">正在同步备份状态…</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2024 Lab Scheduler</p>
+      <p>
+        <a href="index.html">返回仪器概览</a>
+        <span aria-hidden="true">·</span>
+        <a href="README.zh.md">文档</a>
+      </p>
+    </footer>
+  </body>
+</html>

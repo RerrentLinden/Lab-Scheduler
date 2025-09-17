@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>预约日历 · Lab Scheduler</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body class="page page--bookings">
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="top-nav" role="banner">
+      <div class="brand">Lab Scheduler</div>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="index.html">仪器概览</a></li>
+          <li><a class="is-active" href="bookings.html">预约日历</a></li>
+          <li><a href="instruments.html">设备台账</a></li>
+          <li><a href="analytics.html">统计报表</a></li>
+        </ul>
+      </nav>
+      <div class="user-pill" aria-label="当前用户">
+        <span class="user-name">李实验</span>
+        <span class="user-role">超级管理员</span>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <header class="page-header">
+        <div>
+          <h1>预约日历</h1>
+          <p>查看不同仪器的时间安排，协调预约与排班。</p>
+        </div>
+        <div class="page-header__actions">
+          <button type="button" class="button button--secondary" data-export-schedule>
+            导出本周安排
+          </button>
+          <a class="button" href="#create-booking">新建预约</a>
+        </div>
+      </header>
+
+      <section class="panel" aria-label="筛选条件">
+        <form class="filter-bar" data-booking-filter>
+          <div class="form__row">
+            <label class="visually-hidden" for="filterInstrument">选择仪器</label>
+            <select id="filterInstrument" name="instrument">
+              <option value="all">全部仪器</option>
+            </select>
+          </div>
+          <div class="form__row">
+            <label class="visually-hidden" for="filterCategory">分类</label>
+            <select id="filterCategory" name="category">
+              <option value="all">全部分类</option>
+              <option value="chemistry">化学分析</option>
+              <option value="biology">生物检测</option>
+              <option value="imaging">成像/显微</option>
+            </select>
+          </div>
+          <div class="form__row">
+            <label class="visually-hidden" for="filterRange">日期</label>
+            <input id="filterRange" name="date" type="week" />
+          </div>
+          <div class="form__row form__row--inline">
+            <div class="checkbox">
+              <input id="onlyAvailable" type="checkbox" name="onlyAvailable" />
+              <label for="onlyAvailable">仅显示空闲时段</label>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="dayTabHeading">
+        <div class="panel__header">
+          <h2 id="dayTabHeading">本周排班</h2>
+          <p class="panel__meta" data-schedule-meta>选择仪器以查看详细安排</p>
+        </div>
+        <nav class="day-tabs" aria-label="日期切换" role="tablist">
+          <button class="day-tabs__item is-active" type="button" role="tab" data-day="2024-05-13">
+            周一<br /><span>05/13</span>
+          </button>
+          <button class="day-tabs__item" type="button" role="tab" data-day="2024-05-14">
+            周二<br /><span>05/14</span>
+          </button>
+          <button class="day-tabs__item" type="button" role="tab" data-day="2024-05-15">
+            周三<br /><span>05/15</span>
+          </button>
+          <button class="day-tabs__item" type="button" role="tab" data-day="2024-05-16">
+            周四<br /><span>05/16</span>
+          </button>
+          <button class="day-tabs__item" type="button" role="tab" data-day="2024-05-17">
+            周五<br /><span>05/17</span>
+          </button>
+        </nav>
+        <div class="calendar-legend" aria-hidden="true">
+          <span class="legend legend--available">空闲</span>
+          <span class="legend legend--reserved">已预约</span>
+          <span class="legend legend--maintenance">维护</span>
+        </div>
+        <div class="calendar-grid" data-calendar-grid>
+          <p class="placeholder">请选择仪器查看具体排班。</p>
+        </div>
+      </section>
+
+      <section class="panel" id="create-booking" aria-labelledby="createBookingHeading">
+        <h2 id="createBookingHeading">新建预约</h2>
+        <form class="form" data-advanced-booking>
+          <div class="form__row">
+            <label for="bookingInstrument">仪器</label>
+            <select id="bookingInstrument" name="instrument" required>
+              <option value="">请选择仪器</option>
+            </select>
+          </div>
+          <div class="form__row form__row--inline">
+            <div>
+              <label for="bookingDate">日期</label>
+              <input id="bookingDate" name="date" type="date" required />
+            </div>
+            <div>
+              <label for="bookingDuration">时长</label>
+              <select id="bookingDuration" name="duration" required>
+                <option value="1">1 小时</option>
+                <option value="2">2 小时</option>
+                <option value="3">3 小时</option>
+                <option value="4">4 小时（上限）</option>
+              </select>
+            </div>
+          </div>
+          <div class="form__row form__row--inline">
+            <div>
+              <label for="bookingStart">开始时间</label>
+              <input id="bookingStart" name="start" type="time" required />
+            </div>
+            <div>
+              <label for="bookingParticipants">参与人数</label>
+              <input id="bookingParticipants" name="participants" type="number" min="1" max="5" value="1" />
+            </div>
+          </div>
+          <div class="form__row">
+            <label for="bookingPurpose">使用目的</label>
+            <textarea id="bookingPurpose" name="purpose" rows="3" placeholder="描述实验目的，以便审批"></textarea>
+          </div>
+          <div class="form__row form__row--inline">
+            <div class="checkbox">
+              <input id="needsTraining" type="checkbox" name="training" />
+              <label for="needsTraining">申请培训协助</label>
+            </div>
+            <div class="checkbox">
+              <input id="subscribeReminder" type="checkbox" name="reminder" checked />
+              <label for="subscribeReminder">提前 30 分钟提醒</label>
+            </div>
+          </div>
+          <button class="button" type="submit">提交预约申请</button>
+          <p class="form__feedback" data-advanced-feedback hidden></p>
+        </form>
+      </section>
+
+      <aside class="panel panel--secondary" aria-labelledby="slotDetailHeading">
+        <h2 id="slotDetailHeading">时段详情</h2>
+        <div class="slot-detail" data-slot-detail>
+          <p class="placeholder">点击日历中的时段查看预约详情。</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2024 Lab Scheduler</p>
+      <p>
+        <a href="index.html">返回仪器概览</a>
+        <span aria-hidden="true">·</span>
+        <a href="README.zh.md">文档</a>
+      </p>
+    </footer>
+  </body>
+</html>

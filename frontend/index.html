@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab Scheduler 仪器预约平台</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body class="page page--dashboard">
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="top-nav" role="banner">
+      <div class="brand">Lab Scheduler</div>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a class="is-active" href="index.html">仪器概览</a></li>
+          <li><a href="bookings.html">预约日历</a></li>
+          <li><a href="instruments.html">设备台账</a></li>
+          <li><a href="analytics.html">统计报表</a></li>
+        </ul>
+      </nav>
+      <div class="user-pill" aria-label="当前用户">
+        <span class="user-name">李实验</span>
+        <span class="user-role">超级管理员</span>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="card hero" aria-labelledby="dashboardWelcome">
+        <div>
+          <h1 id="dashboardWelcome">欢迎回来，李实验</h1>
+          <p>
+            今日共有 <strong data-metric="reservations-count">0</strong> 笔预约待处理，
+            <strong data-metric="maintenance-count">0</strong> 台设备安排维护。请先查看
+            即将到期的预约和待办事项。
+          </p>
+        </div>
+        <div class="hero-actions">
+          <a class="button" href="bookings.html">快速预约</a>
+          <a class="button button--secondary" href="instruments.html">管理设备</a>
+          <a class="button button--ghost" href="#reports">查看报表</a>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="平台运行概览">
+        <article class="card metric" data-metric-card="active-users">
+          <h2>活跃用户</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>较上周 0%</p>
+        </article>
+        <article class="card metric" data-metric-card="utilization">
+          <h2>仪器利用率</h2>
+          <p class="metric__value">0%</p>
+          <p class="metric__delta" data-delta>周环比 0%</p>
+        </article>
+        <article class="card metric" data-metric-card="no-show">
+          <h2>违约记录</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>本月 0 起</p>
+        </article>
+        <article class="card metric" data-metric-card="favorites">
+          <h2>关注仪器</h2>
+          <p class="metric__value">0</p>
+          <p class="metric__delta" data-delta>常用仪器数量</p>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="availabilityHeading">
+        <div class="panel__header">
+          <h2 id="availabilityHeading">今日热门仪器</h2>
+          <button type="button" class="button button--ghost" data-refresh-availability>
+            刷新数据
+          </button>
+        </div>
+        <div class="availability-grid" data-availability-grid>
+          <p class="placeholder">暂无数据，正在加载热点仪器…</p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="upcomingHeading">
+        <div class="panel__header">
+          <h2 id="upcomingHeading">即将到来的预约</h2>
+          <a class="panel__link" href="bookings.html">查看日历</a>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">仪器</th>
+                <th scope="col">预约人</th>
+                <th scope="col">时间</th>
+                <th scope="col">状态</th>
+                <th scope="col">操作</th>
+              </tr>
+            </thead>
+            <tbody data-reservation-list>
+              <tr>
+                <td colspan="5">正在加载预约数据…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="quickBookingHeading">
+        <h2 id="quickBookingHeading">快速预约</h2>
+        <form class="form" data-quick-booking>
+          <div class="form__row">
+            <label for="quickInstrument">仪器</label>
+            <select id="quickInstrument" name="instrument" required>
+              <option value="">请选择仪器</option>
+            </select>
+          </div>
+          <div class="form__row">
+            <label for="quickDate">日期</label>
+            <input id="quickDate" name="date" type="date" required />
+          </div>
+          <div class="form__row form__row--inline">
+            <div>
+              <label for="quickStart">开始时间</label>
+              <input id="quickStart" name="start" type="time" required />
+            </div>
+            <div>
+              <label for="quickEnd">结束时间</label>
+              <input id="quickEnd" name="end" type="time" required />
+            </div>
+          </div>
+          <div class="form__row">
+            <label for="quickNote">使用目的（可选）</label>
+            <textarea id="quickNote" name="note" rows="2" placeholder="例如：细胞活性检测"></textarea>
+          </div>
+          <button class="button" type="submit">提交预约请求</button>
+          <p class="form__feedback" data-booking-feedback hidden></p>
+        </form>
+      </section>
+
+      <section class="panel panel--secondary" aria-labelledby="waitlistHeading">
+        <h2 id="waitlistHeading">排队通知</h2>
+        <ul class="timeline" data-waitlist>
+          <li class="placeholder">暂无排队提醒。</li>
+        </ul>
+      </section>
+
+      <section class="panel panel--secondary" aria-labelledby="maintenanceHeading">
+        <h2 id="maintenanceHeading">维护提醒</h2>
+        <ul class="maintenance-list" data-maintenance-list>
+          <li class="placeholder">暂无维护任务。</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="reports">
+      <p>© 2024 Lab Scheduler · 实验室仪器预约管理平台</p>
+      <p>
+        <a href="analytics.html">查看利用率报表</a>
+        <span aria-hidden="true">·</span>
+        <a href="README.zh.md">项目文档</a>
+      </p>
+    </footer>
+  </body>
+</html>
