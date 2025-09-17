@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: lab_scheduler
+      MYSQL_USER: lab_scheduler
+      MYSQL_PASSWORD: lab_scheduler
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DB_CLIENT: mysql2
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: lab_scheduler
+      DB_PASSWORD: lab_scheduler
+      DB_NAME: lab_scheduler
+      SESSION_SECRET: change-me-in-production
+      RUN_MIGRATIONS: "true"
+      SEED_SAMPLE_DATA: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:3000"
+
+volumes:
+  db_data:
