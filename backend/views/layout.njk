@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title or '实验室预约平台' }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/css/main.css" />
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <a class="brand" href="/">
+          <span>🔬</span>
+          <span>实验室预约平台</span>
+        </a>
+        {% if currentUser %}
+        <div class="nav-links">
+          <a href="/" class="{% if activeNav == 'dashboard' %}active{% endif %}">仪器概览</a>
+          <a href="/bookings" class="{% if activeNav == 'bookings' %}active{% endif %}">预约日历</a>
+          <a href="/instruments" class="{% if activeNav == 'instruments' %}active{% endif %}">设备台账</a>
+          <a href="/analytics" class="{% if activeNav == 'analytics' %}active{% endif %}">统计报表</a>
+        </div>
+        <div class="user-menu">
+          <span>您好，{{ currentUser.name }}</span>
+          {% if currentUser.role == 'admin' %}
+          <span class="badge">系统管理员</span>
+          {% endif %}
+          <form action="/logout" method="post">
+            <button type="submit" class="secondary">退出</button>
+          </form>
+        </div>
+        {% else %}
+        <div class="nav-links">
+          <a href="/login" class="{% if activeNav == 'login' %}active{% endif %}">登录</a>
+          <a href="/register" class="{% if activeNav == 'register' %}active{% endif %}">注册</a>
+        </div>
+        {% endif %}
+      </nav>
+    </header>
+    <main class="container">
+      {% if flash %}
+      <div class="flash {{ flash.type }}">
+        {{ flash.message }}
+      </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+      <small>© {{ currentYear }} 实验室仪器共享中心</small>
+    </footer>
+    <script src="/js/main.js" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,111 +1,92 @@
 # Lab Scheduler
 
-## Project Overview
-Lab Scheduler is a laboratory instrument reservation platform designed to help research teams coordinate shared equipment usage. The goal of this document is to provide a project-wide reference for future development and deployment work. It captures the planned feature set, chosen technology stack, and the conventions that subsequent contributors should follow.
+Lab Scheduler 是一个用于科研仪器预约与管理的全栈应用，支持用户注册登录、设备台账维护、预约冲突校验以及基础统计分析。系统采用服务端渲染的响应式界面，可通过 Docker Compose 一键部署。
 
-## Core Feature Modules
-### User Management
-- **Registration & Login**: Account creation with mobile number, password, and username fields plus password recovery.
-- **Role Permissions**: Super administrators (also equipment managers) can configure the entire system; regular users can browse and book instruments.
-- **Personal Dashboard**:
-  - Update password and view account metadata.
-  - Charts for frequently used instruments and typical usage windows.
-  - Manage favorite instruments for one-click booking.
+## 主要功能
 
-### Instrument Management
-- Maintain instrument metadata (photo, name, unique ID, category, room, bench location, responsible contact).
-- Track availability states (available, maintenance, retired) with change history.
-- Record maintenance logs, next service reminders, and maintenance contacts.
+- **账号体系**：支持注册、登录与登出，区分普通用户和管理员角色。
+- **设备台账**：展示仪器信息、状态与维护计划，管理员可在线新增设备。
+- **预约管理**：按日查看指定仪器的预约情况，校验最短提前时间、最长时长及冲突。
+- **统计报表**：输出近月预约趋势、热门仪器排行与取消率概览。
+- **示例数据**：提供预置账号、仪器与预约，便于评估与演示。
 
-### Instrument Booking
-- Calendar view per instrument, showing hourly reservations with color coding.
-- Booking rules: reserve ≥30 minutes in advance, cancel ≥30 minutes ahead with a reason, maximum 4-hour slot length, reservations up to one day in advance.
-- Quick selection of currently available instruments within a category.
-- QR-based quick reservation and sign-in to confirm usage start.
+## 技术栈
 
-### Conflict Handling & Waitlists
-- Auto-release reservations if users fail to sign in within 15 minutes; notify waitlisted users in sequence.
-- Allow active sessions to request extensions while checking downstream conflicts and alerting affected users.
-- Users can opt into waitlists with customizable notification windows.
+- Node.js 20、Express 4、Nunjucks 模板渲染
+- Knex 查询构建器，生产使用 MySQL 8，测试默认 SQLite 内存库
+- 会话存储基于 `connect-session-knex`
+- Vitest 作为业务规则测试框架
+- Docker & Docker Compose 编排应用与数据库服务
 
-### Analytics & Reporting
-- Monthly utilization summaries, usage frequency rankings, idle slot analysis.
-- Persistent reservation history with filters by date range, user, or instrument and export to Excel.
-- Track policy violations (no-shows, frequent cancellations, overuse) and maintain a credit score that influences queue priority.
+## 目录结构
 
-### System Reliability & Notifications
-- Persist all booking and audit data, support Excel exports, and schedule automated backups.
-- Notification events: booking confirmation, pre-use reminders, cancellation updates, and equipment restored alerts.
-
-## Architectural Approach
-The system will be implemented as a **monolithic Node.js (Express) application** that serves HTML pages rendered with a lightweight templating engine (e.g., EJS or Nunjucks). This approach keeps the technology footprint small and avoids the operational overhead of a fully separated front-end and back-end stack, while still enabling interactive browser-based experiences with progressive enhancement via vanilla JavaScript when needed.
-
-Key integration points:
-1. **Server-rendered HTML UI**: Core pages are rendered on the server and progressively enhanced in the browser.
-2. **RESTful endpoints for dynamic features**: Background updates (e.g., calendar refresh, statistics charts) can be handled through JSON endpoints as the project evolves.
-3. **MySQL database**: Central data store for users, instruments, reservations, maintenance logs, and analytics snapshots.
-4. **Dockerized deployment**: Application and database are containerized to simplify setup across environments.
-
-## Planned Directory Structure
-The repository will evolve toward the following layout as features are implemented:
 ```
 Lab-Scheduler/
-├── backend/           # Express application source (routes, services, templates, static assets)
-├── database/          # SQL schema, seed data, and migration scripts
-├── docker/            # Dockerfiles and docker-compose configurations
-├── docs/              # Additional documentation (API specs, design notes)
-├── scripts/           # Automation scripts (backup, maintenance, reporting)
-└── tests/             # Automated test suites (unit, integration, end-to-end)
+├── backend/                 # Node.js 应用源码
+│   ├── migrations/          # 数据库迁移脚本
+│   ├── public/              # 静态资源（CSS/JS）
+│   ├── seeds/               # 示例数据
+│   ├── src/                 # 应用主代码（路由、控制器、服务等）
+│   ├── tests/               # Vitest 测试
+│   └── views/               # Nunjucks 模板
+├── docker-compose.yml       # 本地或生产部署编排文件
+├── Dockerfile               # 应用容器镜像定义
+├── README.md                # 英文说明（当前文档）
+└── README.zh.md             # 中文说明
 ```
-For now only documentation lives in the repository; create the above directories as the corresponding functionality is implemented.
 
-## Development Workflow
-### Prerequisites
-- Node.js 20+ and npm.
-- MySQL 8 (local install or containerized instance).
-- Docker and Docker Compose for container-based workflows.
+## 本地运行
 
-### Environment Configuration
-1. Copy `.env.example` (to be added later) to `.env` and configure:
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` for MySQL access.
-   - `SESSION_SECRET` and other security-related values.
-2. Initialize the database using the forthcoming migration scripts.
-3. Install JavaScript dependencies in `backend/` with `npm install` once the backend scaffold is committed.
+1. 进入 `backend/` 并安装依赖：
+   ```bash
+   cd backend
+   npm install
+   ```
+2. 复制环境变量样例：
+   ```bash
+   cp .env.example .env
+   ```
+   根据实际 MySQL 设置调整 `DB_HOST`、`DB_USER` 等字段。
+3. 执行数据库迁移与示例数据填充：
+   ```bash
+   npm run migrate
+   npm run seed
+   ```
+4. 启动开发服务器：
+   ```bash
+   npm run dev
+   ```
+   默认监听 `http://localhost:3000`。
 
-### Local Development (planned)
-1. Start MySQL locally or via Docker.
-2. Run database migrations and seed data.
-3. Launch the Express dev server (e.g., `npm run dev`) and access the UI via the printed URL.
-4. Use linting (`npm run lint`) and tests (`npm test`) before committing changes.
+### 预置账号
 
-## Docker & Deployment Strategy
-- A `docker-compose.yml` file will orchestrate the Express app and a MySQL service.
-- The application container will expose HTTP port 8080 (configurable), while MySQL will expose 3306 internally.
-- Persistent volumes will store database data and uploaded assets.
-- CI/CD pipelines should build and push versioned images, run automated tests, and trigger rolling updates on the target server.
+- 管理员：`admin@example.com` / `Admin123!`
+- 普通用户：`zhangwei@example.com` / `User123!`
 
-## Data Management Guidelines
-- Keep all reservation and audit records indefinitely; design tables with archival partitions if necessary.
-- Schedule regular automated database backups and store them securely (e.g., compressed dumps exported nightly).
-- Provide CSV/Excel export endpoints to satisfy reporting requirements.
+## 测试
 
-## Testing & Quality Assurance
-- Unit tests for business rules (booking limits, conflict detection, notification triggers).
-- Integration tests covering booking workflows end-to-end.
-- Linting and formatting to maintain consistent code style.
-- Security reviews for authentication, authorization, and input validation.
+在 `backend/` 目录运行：
+```bash
+npm test
+```
+Vitest 会使用内存 SQLite 自动迁移与填充数据，用于校验预约业务规则。
 
-## Roadmap Highlights
-1. Scaffold Express backend with authentication and session management.
-2. Implement core CRUD flows for instruments and reservations.
-3. Build calendar and analytics visualizations.
-4. Add notification services (email/SMS/push) as needed.
-5. Harden deployment scripts and monitoring.
+## Docker Compose 部署
 
-## Contributing
-- Follow Git-based feature branching (or short-lived topic branches) and submit pull requests for review.
-- Keep documentation and configuration files updated with each feature addition.
-- Coordinate database schema changes through versioned migration scripts.
+仓库根目录提供 `docker-compose.yml`，包含 `app`（Node.js）与 `db`（MySQL）两个服务：
 
-## License
-Project licensing will be defined once the codebase is established. Until then, contributions remain proprietary to the originating team.
+```bash
+docker compose up --build -d
+```
+
+- 首次启动会执行迁移并根据 `SEED_SAMPLE_DATA` 环境变量写入示例数据。
+- 应用默认暴露在 `http://localhost:8080`，MySQL 对外端口为 `3306`。
+- 如不希望填充示例数据，可将 `SEED_SAMPLE_DATA` 设为 `false`。
+
+## 后续规划
+
+- 增补预约审批、签到与等待队列等高级流程
+- 引入通知中心（邮件 / 短信）与日志审计
+- 扩展自动化测试覆盖页面渲染与接口
+
+如需更多中文说明，请参阅 `README.zh.md`。

@@ -1,0 +1,133 @@
+{% extends "layout.njk" %}
+{% set title = '设备台账' %}
+
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <h1>设备台账</h1>
+      <p style="color:var(--text-muted);">管理仪器基础信息，掌握库存状态与维护计划。</p>
+    </div>
+  </div>
+
+  <section class="card" style="margin-bottom:1.5rem;">
+    <form method="get" class="form-row" style="align-items:end;">
+      <div>
+        <label for="search">关键词</label>
+        <input type="text" id="search" name="search" value="{{ filters.search }}" placeholder="名称 / 编号 / 管理人" />
+      </div>
+      <div>
+        <label for="status">状态</label>
+        <select id="status" name="status">
+          <option value="">全部</option>
+          {% for key, label in statusLabels %}
+          <option value="{{ key }}" {% if filters.status == key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="category">分类</label>
+        <input type="text" id="category" name="category" value="{{ filters.category }}" placeholder="如 chemistry" />
+      </div>
+      <div>
+        <button type="submit">筛选</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>仪器列表</h2>
+    {% if instruments.length %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>编号</th>
+          <th>位置</th>
+          <th>状态</th>
+          <th>负责人</th>
+          <th>维护计划</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for instrument in instruments %}
+        <tr>
+          <td>
+            <strong>{{ instrument.name }}</strong><br />
+            <span style="color:var(--text-muted);">{{ instrument.description }}</span>
+          </td>
+          <td>{{ instrument.code }}</td>
+          <td>{{ instrument.room }}</td>
+          <td>
+            <span class="badge {% if instrument.status == 'available' %}success{% elif instrument.status == 'maintenance' %}danger{% endif %}">
+              {{ statusLabels[instrument.status] or instrument.status }}
+            </span>
+          </td>
+          <td>{{ instrument.manager }}</td>
+          <td>
+            <div>上次维护：{{ instrument.last_service | date('YYYY-MM-DD') }}</div>
+            <div>下次维护：{{ instrument.next_maintenance | date('YYYY-MM-DD') }}</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>暂无设备记录。</p>
+    {% endif %}
+  </section>
+
+  {% if currentUser and currentUser.role == 'admin' %}
+  <section class="card" style="margin-top:1.5rem;">
+    <h2>新增设备</h2>
+    <form action="/instruments" method="post">
+      <div class="form-row">
+        <div>
+          <label for="name">名称</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+          <label for="code">编号</label>
+          <input type="text" id="code" name="code" required />
+        </div>
+        <div>
+          <label for="category">分类</label>
+          <input type="text" id="category" name="category" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="room">位置</label>
+          <input type="text" id="room" name="room" required />
+        </div>
+        <div>
+          <label for="status">状态</label>
+          <select id="instrument-status" name="status">
+            {% for key, label in statusLabels %}
+            <option value="{{ key }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="manager">负责人</label>
+          <input type="text" id="manager" name="manager" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="last_service">上次维护</label>
+          <input type="date" id="last_service" name="last_service" />
+        </div>
+        <div>
+          <label for="next_maintenance">下次维护</label>
+          <input type="date" id="next_maintenance" name="next_maintenance" />
+        </div>
+      </div>
+      <div>
+        <label for="description">描述</label>
+        <textarea id="description" name="description" rows="3"></textarea>
+      </div>
+      <button type="submit">保存</button>
+    </form>
+  </section>
+  {% endif %}
+{% endblock %}

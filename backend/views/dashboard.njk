@@ -1,0 +1,115 @@
+{% extends "layout.njk" %}
+{% set title = '仪器概览' %}
+
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <h1>仪器概览</h1>
+      <p style="color:var(--text-muted);">查看核心指标与近期预约动态，快速掌握仪器运行状态。</p>
+    </div>
+  </div>
+
+  <section class="card-grid">
+    <div class="card">
+      <h2>平台注册用户</h2>
+      <p class="metric-value">{{ metrics.totalUsers }}</p>
+      <p class="metric-delta">近 30 天活跃用户 {{ metrics.activeUsers }}</p>
+    </div>
+    <div class="card">
+      <h2>可预约仪器</h2>
+      <p class="metric-value">{{ metrics.instrumentCount }}</p>
+      <p class="metric-delta">库存状态 {{ instrumentSummary.status | length }} 类</p>
+    </div>
+    <div class="card">
+      <h2>未来预约</h2>
+      <p class="metric-value">{{ metrics.upcomingReservations }}</p>
+      <p class="metric-delta">本月取消 {{ metrics.cancellationsThisMonth }}</p>
+    </div>
+    <div class="card">
+      <h2>资源利用率</h2>
+      <p class="metric-value">{{ (metrics.utilization * 100) | round(1) }}%</p>
+      <p class="metric-delta">最近 7 天计算，假定每日开放 12 小时</p>
+    </div>
+  </section>
+
+  <section class="grid-two">
+    <div class="card">
+      <h2>我的近期预约</h2>
+      {% if personalReservations.length %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>仪器</th>
+            <th>时间</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reservation in personalReservations %}
+          <tr>
+            <td>{{ reservation.instrument_name }}</td>
+            <td>{{ reservation.start_time | date('YYYY-MM-DD HH:mm') }} ~ {{ reservation.end_time | date('HH:mm') }}</td>
+            <td><span class="badge {% if reservation.status == 'cancelled' %}danger{% else %}success{% endif %}">{{ reservation.status == 'cancelled' ? '已取消' : '已确认' }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>暂无预约，前往 <a href="/bookings">预约日历</a> 选择合适时段。</p>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h2>实验室近期动态</h2>
+      {% if upcoming.length %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>仪器</th>
+            <th>预约人</th>
+            <th>开始时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reservation in upcoming %}
+          <tr>
+            <td>{{ reservation.instrument_name }}</td>
+            <td>{{ reservation.user_name }}</td>
+            <td>{{ reservation.start_time | date('MM-DD HH:mm') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>暂无即将开始的预约。</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:1.5rem;">
+    <h2>当前可用仪器</h2>
+    {% if availableInstruments.length %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>编号</th>
+          <th>位置</th>
+          <th>负责人</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for instrument in availableInstruments %}
+        <tr>
+          <td>{{ instrument.name }}</td>
+          <td>{{ instrument.code }}</td>
+          <td>{{ instrument.room }}</td>
+          <td>{{ instrument.manager }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>暂无标记为可用的仪器。</p>
+    {% endif %}
+  </section>
+{% endblock %}

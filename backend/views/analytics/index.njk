@@ -1,0 +1,82 @@
+{% extends "layout.njk" %}
+{% set title = '统计报表' %}
+
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <h1>统计报表</h1>
+      <p style="color:var(--text-muted);">掌握仪器使用趋势、热门设备排名及取消率分布。</p>
+    </div>
+  </div>
+
+  <section class="card-grid">
+    <div class="card">
+      <h2>近 30 天取消</h2>
+      <p class="metric-value">{{ overview.cancelledLast30Days }}</p>
+      <p class="metric-delta">总取消次数 {{ overview.cancelled }}</p>
+    </div>
+    <div class="card">
+      <h2>累计预约</h2>
+      <p class="metric-value">{{ overview.total }}</p>
+      <p class="metric-delta">平台当前注册用户 {{ metrics.totalUsers }}</p>
+    </div>
+    <div class="card">
+      <h2>可用仪器</h2>
+      <p class="metric-value">{{ metrics.instrumentCount }}</p>
+      <p class="metric-delta">资源利用率 {{ (metrics.utilization * 100) | round(1) }}%</p>
+    </div>
+  </section>
+
+  <section class="grid-two" style="margin-top:1.5rem;">
+    <div class="card">
+      <h2>月份预约趋势</h2>
+      {% if monthlyUsage.length %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th>预约次数</th>
+            <th>累计小时</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bucket in monthlyUsage %}
+          <tr>
+            <td>{{ bucket.label }}</td>
+            <td>{{ bucket.reservations }}</td>
+            <td>{{ bucket.hours | round(1) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>暂无统计数据。</p>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h2>热门仪器排行</h2>
+      {% if leaderboard.length %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>仪器</th>
+            <th>预约次数</th>
+            <th>累计小时</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in leaderboard %}
+          <tr>
+            <td>{{ item.name }}<br /><span style="color:var(--text-muted);">编号 {{ item.code }}</span></td>
+            <td>{{ item.reservations }}</td>
+            <td>{{ item.hours | round(1) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>暂无排行数据。</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

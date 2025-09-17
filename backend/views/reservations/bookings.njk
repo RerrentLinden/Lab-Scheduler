@@ -1,0 +1,104 @@
+{% extends "layout.njk" %}
+{% set title = '预约日历' %}
+
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <h1>预约日历</h1>
+      <p style="color:var(--text-muted);">查询各仪器的预约情况，并提交新的预约申请。</p>
+    </div>
+  </div>
+
+  <section class="card" style="margin-bottom:1.5rem;">
+    <form method="get" class="form-row" id="reservation-filter">
+      <div>
+        <label for="instrument-select">选择仪器</label>
+        <select id="instrument-select" name="instrumentId">
+          {% for instrument in instruments %}
+          <option value="{{ instrument.id }}" {% if instrument.id == selectedInstrumentId %}selected{% endif %}>{{ instrument.name }} ({{ instrument.code }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="date-input">日期</label>
+        <input type="date" id="date-input" name="date" value="{{ selectedDate }}" />
+      </div>
+      <div>
+        <button type="submit">查看</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="grid-two">
+    <div class="card">
+      <h2>{{ selectedDate }} 的预约</h2>
+      {% if reservations.length %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>时间段</th>
+            <th>使用人</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reservation in reservations %}
+          <tr>
+            <td>{{ reservation.start_time | date('HH:mm') }} ~ {{ reservation.end_time | date('HH:mm') }}</td>
+            <td>{{ reservation.user_name }}</td>
+            <td>
+              <span class="badge {% if reservation.status == 'cancelled' %}danger{% else %}success{% endif %}">
+                {{ reservation.status == 'cancelled' ? '已取消' : '已确认' }}
+              </span>
+            </td>
+            <td>
+              {% if reservation.status != 'cancelled' and currentUser and (reservation.user_id == currentUser.id or currentUser.role == 'admin') %}
+              <form action="/reservations/cancel" method="post">
+                <input type="hidden" name="reservationId" value="{{ reservation.id }}" />
+                <input type="hidden" name="instrumentId" value="{{ selectedInstrumentId }}" />
+                <input type="hidden" name="date" value="{{ selectedDate }}" />
+                <button type="submit" class="secondary">取消</button>
+              </form>
+              {% else %}
+              —
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>该日暂无预约，欢迎提交申请。</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>发起预约</h2>
+      <form action="/reservations" method="post">
+        <input type="hidden" name="instrument_id" value="{{ selectedInstrumentId }}" />
+        <input type="hidden" name="date" value="{{ selectedDate }}" />
+        <div class="form-row">
+          <div>
+            <label for="start_time">开始时间</label>
+            <input type="time" id="start_time" name="start_time" required />
+          </div>
+          <div>
+            <label for="end_time">结束时间</label>
+            <input type="time" id="end_time" name="end_time" required />
+          </div>
+        </div>
+        <div>
+          <label for="notes">用途说明（可选）</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="例如：样品编号、实验目的"></textarea>
+        </div>
+        <p style="color:var(--text-muted); font-size:0.9rem;">预约需至少提前 30 分钟，单次最长 4 小时。</p>
+        <button type="submit">提交预约</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/bookings.js" defer></script>
+{% endblock %}
